@@ -406,3 +406,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+ps1/.vscode/settings.json
