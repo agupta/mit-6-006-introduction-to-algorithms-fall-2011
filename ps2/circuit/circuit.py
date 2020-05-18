@@ -341,56 +341,51 @@ class Transition:
         return id
 
 class PriorityQueue:
-    """Array-based priority queue implementation."""
     def __init__(self):
-        """Initially empty priority queue."""
-        self.queue = []
-        self.min_index = None
-    
+        self.heap = []
     def __len__(self):
-        # Number of elements in the queue.
-        return len(self.queue)
-    
-    def append(self, key):
-        """Inserts an element in the priority queue."""
-        if key is None:
-            raise ValueError('Cannot insert None in the queue')
-        self.queue.append(key)
-        self.min_index = None
-    
+        return len(self.heap)
+    @staticmethod
+    def _left(i):
+        return 2*i+1
+    @staticmethod
+    def _right(i):
+        return 2*(i+1)
+    @staticmethod
+    def _parent(i):
+        return (i+1)//2 - 1
     def min(self):
-        """The smallest element in the queue."""
-        if len(self.queue) == 0:
+        if len(self) == 0:
             return None
-        self._find_min()
-        return self.queue[self.min_index]
-    
+        return self.heap[0]
+    def _swap(self, i, j):
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+    def min_heapify(self, i):
+        swap = False
+        min_index = i
+        if PriorityQueue._right(i) < len(self) and self.heap[PriorityQueue._right(i)] < self.heap[min_index]:
+            swap = True
+            min_index = PriorityQueue._right(i)
+        if PriorityQueue._left(i) < len(self) and self.heap[PriorityQueue._left(i)] < self.heap[min_index]:
+            swap = True
+            min_index = PriorityQueue._left(i)
+        if swap:
+            self._swap(i, min_index)
+            self.min_heapify(min_index)
     def pop(self):
-        """Removes the minimum element in the queue.
-    
-        Returns:
-            The value of the removed element.
-        """
-        if len(self.queue) == 0:
+        if len(self) == 0:
             return None
-        self._find_min()
-        popped_key = self.queue.pop(self.min_index)
-        self.min_index = None
-        return popped_key
-    
-    def _find_min(self):
-        # Computes the index of the minimum element in the queue.
-        #
-        # This method may crash if called when the queue is empty.
-        if self.min_index is not None:
-            return
-        min = self.queue[0]
-        self.min_index = 0
-        for i in xrange(1, len(self.queue)):
-            key = self.queue[i]
-            if key < min:
-                min = key
-                self.min_index = i
+        min = self.min()
+        self.heap[0] = self.heap[-1]
+        self.heap.pop()
+        self.min_heapify(0)
+        return min
+    def append(self, key):
+        i = len(self)
+        self.heap.append(key)
+        while PriorityQueue._parent(i) >= 0 and self.heap[PriorityQueue._parent(i)] > self.heap[i]:
+            self._swap(PriorityQueue._parent(i), i)
+            i = PriorityQueue._parent(i)
 
 class Simulation:
     """State needed to compute a circuit's state as it evolves over time."""
