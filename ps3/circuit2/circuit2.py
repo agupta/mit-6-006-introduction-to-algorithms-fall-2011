@@ -161,7 +161,7 @@ class RangeIndex(object):
   def list(self, first_key, last_key):
     """List of values for the keys that fall within [first_key, last_key]."""
     #return [key for key in self.data if first_key <= key <= last_key]
-    return self.data.list(first_key, last_key)
+    return [node.key for node in self.data.list(first_key, last_key)]
   
   def count(self, first_key, last_key):
     """Number of keys that fall within [first_key, last_key]."""
@@ -171,7 +171,10 @@ class RangeIndex(object):
     #     result += 1
     # return result
     #return self.data.rank(last_key) - self.data.rank(first_key)
-    return len(self.data.list(first_key, last_key))
+
+    #if self.data.find(first_key):
+    #  return self.data.rank(last_key) - self.data.rank(first_key) + 1
+    return self.data.rank(last_key) - self.data.rank(first_key)
 
 class TracedRangeIndex(RangeIndex):
   """Augments RangeIndex to build a trace for the visualizer."""
